@@ -34,15 +34,12 @@ struct Board
 
 #define HEIGHT 30
 #define WIDTH 10
+#define SHAPE_N 5
 
 #define FRAME_MS 16
 #define FALL_MS 1000
 
-const bool SHAPES[6][3][3] = {
-    {{0, 1, 1},
-     {0, 1, 1},
-     {0, 0, 0}},
-
+const bool SHAPES[SHAPE_N][3][3] = {
     {{0, 1, 0},
      {1, 1, 1},
      {0, 0, 0}},
@@ -70,7 +67,7 @@ bool check(const bool (*shape)[3], struct Board (*BOARD)[WIDTH], int x, int y)
     {
         for (int j = 0; j < 3; ++j)
         {
-            if (shape[i][j] && BOARD[y + i][x + j].occupied)
+            if (shape[i][j] && (y+i <= 0 || y+i>=20 || x+j<0 || x+j>=WIDTH || BOARD[y + i][x + j].occupied))
             {
                 return false;
             }
@@ -103,7 +100,7 @@ int main(void)
     printw("\033[2J\033[H");
     fflush(stdout);
 
-    int r = rand() % 6;
+    int r = rand() % SHAPE_N;
     b1.shape = SHAPES[r];
     b1.active = true;
 
@@ -129,6 +126,10 @@ int main(void)
         move(0, 0);
 
         if (ch == 'q')
+        {
+            break;
+        }
+        if (ch == 27)
         {
             break;
         }
@@ -176,6 +177,14 @@ int main(void)
         if (ch == KEY_DOWN && b1.active && check(b1.shape, BOARD, b1.x, b1.y + 1))
         {
             b1.y++;
+        }
+        if (ch == KEY_RIGHT && b1.active && check(b1.shape, BOARD, b1.x+1, b1.y))
+        {
+            b1.x++;
+        }
+        if (ch == KEY_LEFT && b1.active && check(b1.shape, BOARD, b1.x-1, b1.y))
+        {
+            b1.x--;
         }
 
         for (int i = 0; i < 3; ++i)
